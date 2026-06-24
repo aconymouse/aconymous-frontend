@@ -1,10 +1,5 @@
 "use client";
 
-// ============================================================
-// Nav — Navigasi utama, sticky, dengan dark mode toggle.
-// Client component karena butuh akses localStorage + window.
-// ============================================================
-
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -15,11 +10,11 @@ const navLinks = [
 ];
 
 export function Nav() {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setMounted(true);
+    // Baca state tema dari DOM — diset duluan oleh FOUC script di layout.tsx
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(document.documentElement.classList.contains("dark"));
   }, []);
 
@@ -29,7 +24,7 @@ export function Nav() {
     document.documentElement.classList.toggle("dark", next);
     try {
       localStorage.setItem("theme", next ? "dark" : "light");
-    } catch (e) {}
+    } catch {}
   };
 
   return (
@@ -46,7 +41,6 @@ export function Nav() {
       }}
     >
       <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo / Brand */}
         <Link
           href="/"
           aria-label="Aconymous — Kembali ke halaman utama"
@@ -61,7 +55,6 @@ export function Nav() {
         </Link>
 
         <div className="flex items-center gap-6">
-          {/* Main navigation */}
           <nav aria-label="Navigasi utama">
             <ul className="flex items-center gap-6 list-none">
               {navLinks.map((link) => (
@@ -78,8 +71,7 @@ export function Nav() {
             </ul>
           </nav>
 
-          {/* Dark mode toggle — hidden until mounted to avoid hydration mismatch */}
-          {mounted && (
+          {isDark !== null && (
             <button
               onClick={toggleTheme}
               aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
@@ -92,7 +84,6 @@ export function Nav() {
                 color: "var(--text-secondary)",
                 lineHeight: 1,
                 fontSize: "13px",
-                transition: "border-color 0.15s ease, color 0.15s ease",
               }}
             >
               {isDark ? "☀" : "☾"}
